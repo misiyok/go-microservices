@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/misiyok/go-microservices/product-api/handlers"
 )
 
@@ -18,8 +20,20 @@ func main() {
 
 	// Creating our own serve mux, our own handler structs
 	// -> we can then do dependency injection
-	sm := http.NewServeMux()
-	sm.Handle("/", ph)
+	sm := mux.NewRouter()
+
+	getRouter := sm.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/", ph.GetProducts)
+
+	putRouter := sm.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProducts)
+	putRouter.Use(ph.MiddlewareProductValidation)
+
+	postRouter := sm.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ph.AddProduct)
+	postRouter.Use(ph.MiddlewareProductValidation)
+
+	// sm.Handle("/products", ph)
 
 	s := &http.Server{
 		Addr:         ":9090",
