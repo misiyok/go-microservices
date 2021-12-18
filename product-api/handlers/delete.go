@@ -8,6 +8,12 @@ import (
 	"github.com/misiyok/go-microservices/product-api/data"
 )
 
+// swagger:route DELETE /products/{id} products deleteProduct
+// Deletes a product
+// responses:
+//  201: noContent
+
+// DeleteProduct deletes a product from the database
 func (p *Products) DeleteProducts(rw http.ResponseWriter, r *http.Request) {
 	// this will always convert because of the router
 	vars := mux.Vars(r)
